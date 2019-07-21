@@ -2,11 +2,11 @@
 # Vivado v2018.2 (64-bit)
 # SW Build 2258646 on Thu Jun 14 20:03:12 MDT 2018
 # IP Build 2256618 on Thu Jun 14 22:10:49 MDT 2018
-# Start of session at: Fri Jul 19 16:41:13 2019
-# Process ID: 6908
-# Current directory: C:/Users/Josh/Documents/FPGAs_and_HDL/FPGA-ALU/FPGA-ALU.runs/synth_1
+# Start of session at: Sat Jul 20 20:15:35 2019
+# Process ID: 2188
+# Current directory: C:/Users/Josh/Programming/Projects/verilog/FPGA-ALU/FPGA-ALU.runs/synth_1
 # Command line: vivado.exe -log DISP.vds -product Vivado -mode batch -messageDb vivado.pb -notrace -source DISP.tcl
-# Log file: C:/Users/Josh/Documents/FPGAs_and_HDL/FPGA-ALU/FPGA-ALU.runs/synth_1/DISP.vds
-# Journal file: C:/Users/Josh/Documents/FPGAs_and_HDL/FPGA-ALU/FPGA-ALU.runs/synth_1\vivado.jou
+# Log file: C:/Users/Josh/Programming/Projects/verilog/FPGA-ALU/FPGA-ALU.runs/synth_1/DISP.vds
+# Journal file: C:/Users/Josh/Programming/Projects/verilog/FPGA-ALU/FPGA-ALU.runs/synth_1\vivado.jou
 #-----------------------------------------------------------
 source DISP.tcl -notrace

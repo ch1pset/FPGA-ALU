@@ -27,10 +27,10 @@ module ADD16(
     output Cout
     );
     wire [2:0] Co;
-    ADD4 A1(A[3:0],   B[3:0],   Cin,   S[3:0],   Co[0]);
-    ADD4 A2(A[7:4],   B[7:4],   Co[0], S[7:4],   Co[1]);
-    ADD4 A3(A[11:8],  B[11:8],  Co[1], S[11:8],  Co[2]);
-    ADD4 A4(A[15:12], B[15:12], Co[2], S[15:12], Cout);
+    ADD4 A1(A[0  +:4], B[0  +:4], Cin,   S[0  +:4], Co[0]);
+    ADD4 A2(A[4  +:4], B[4  +:4], Co[0], S[4  +:4], Co[1]);
+    ADD4 A3(A[8  +:4], B[8  +:4], Co[1], S[8  +:4], Co[2]);
+    ADD4 A4(A[12 +:4], B[12 +:4], Co[2], S[12 +:4], Cout);
     
 endmodule
 
@@ -42,13 +42,13 @@ module ADD4(
     output Cout
     );
     wire [2:0] Co;
-    FADDER A1(S[0], Co[0], A[0], B[0],  Cin  );
-    FADDER A2(S[1], Co[1], A[1], B[1],  Co[0]);
-    FADDER A3(S[2], Co[2], A[2], B[2],  Co[1]);
-    FADDER A4(S[3], Cout,  A[3], B[3],  Co[2]);
+    FADDER A1(A[0], B[0],  Cin  , S[0], Co[0]);
+    FADDER A2(A[1], B[1],  Co[0], S[1], Co[1]);
+    FADDER A3(A[2], B[2],  Co[1], S[2], Co[2]);
+    FADDER A4(A[3], B[3],  Co[2], S[3],  Cout);
 endmodule
 
-module FADDER(output S, Cout, input A, B, Cin);
+module FADDER(input A, B, Cin, output S, Cout);
     wire s1, c1, c2;
     assign s1 = A ^ B;
     assign S = s1 ^ Cin;

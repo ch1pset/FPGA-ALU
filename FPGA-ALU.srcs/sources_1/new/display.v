@@ -20,33 +20,23 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module DISPLAY(
+module REFRESH(
     input [31:0] NUM,
     input INCLK,
+    input EN,
     output [7:0] SSEG_CA,
     output [7:0] SSEG_AN
     );
-    reg [2:0] TICK = 0; // 16 ms per frame = 60
-    reg [7:0] POS = 8'h01;
-    reg [2:0] COUNT = 2'b00;
+    reg [2:0] COUNT = 3'b000;
     wire CLK;
     
     DISPCLK DCLK(INCLK, CLK);
-    
-    DIGIT D1(NUM[3*COUNT +: 4], POS, TICK, SSEG_CA, SSEG_AN);
+    POSSEL  SEL(COUNT, CLK, EN, SSEG_AN);
+    DIGIT   D1(NUM[4*COUNT +: 4], CLK, EN, SSEG_CA);
     
     always@(posedge CLK)
     begin
-        TICK = TICK + 1;
-    end
-    
-    always@(posedge TICK[2])
-    begin
         COUNT = COUNT + 1;
-        case(POS)
-            8'h80: POS = 8'h01;
-            default: POS = (POS << 1);
-        endcase
     end
     
 endmodule
@@ -56,9 +46,9 @@ module DISPCLK(
     output reg OUTCLK = 0
     );
     reg [31:0] slow;
-    always@(posedge INCLK) // 50 000 000 in 1 sec
+    always@(posedge INCLK)
     begin
-        if(slow < 50000) // 50 000 in 1 ms
+        if(slow < 100000)
             slow = slow + 1;
         else begin
             slow = 32'h00000000;
@@ -69,52 +59,68 @@ endmodule
 
 module DIGIT(
     input [3:0] BIN,
-    input [7:0] POS,
+    input CLK,
     input EN,
-    output reg [7:0] SSEG_CA,
-    output reg [7:0] SSEG_AN
+    output reg [7:0] SSEG_CA
     );
-//    POS_SELECT SEL(POS, EN, SSEG_AN);
-    always@(posedge EN)
+    reg [7:0] HEX_ROM [15:0];
+    reg [7:0] OFF;
+    initial 
     begin
-        SSEG_AN = POS;
-        case(BIN)
-            4'h0: SSEG_CA = 8'b11111100;
-            4'h1: SSEG_CA = 8'b01100000;
-            4'h2: SSEG_CA = 8'b11011010;
-            4'h3: SSEG_CA = 8'b11110010;
-            4'h4: SSEG_CA = 8'b01100110;
-            4'h5: SSEG_CA = 8'b10110110;
-            4'h6: SSEG_CA = 8'b10111110;
-            4'h7: SSEG_CA = 8'b11100000;
-            4'h8: SSEG_CA = 8'b11111110;
-            4'h9: SSEG_CA = 8'b11110110;
-            4'hA: SSEG_CA = 8'b11101110;
-            4'hB: SSEG_CA = 8'b00111110;
-            4'hC: SSEG_CA = 8'b10011100;
-            4'hD: SSEG_CA = 8'b01111010;
-            4'hE: SSEG_CA = 8'b10011110;
-            4'hF: SSEG_CA = 8'b10001110;
-        endcase
+        HEX_ROM[ 0] = ~8'b11111100;
+        HEX_ROM[ 1] = ~8'b01100000;
+        HEX_ROM[ 2] = ~8'b11011010;
+        HEX_ROM[ 3] = ~8'b11110010;
+        HEX_ROM[ 4] = ~8'b01100110;
+        HEX_ROM[ 5] = ~8'b10110110;
+        HEX_ROM[ 6] = ~8'b10111110;
+        HEX_ROM[ 7] = ~8'b11100000;
+        HEX_ROM[ 8] = ~8'b11111110;
+        HEX_ROM[ 9] = ~8'b11110110;
+        HEX_ROM[10] = ~8'b11101110;
+        HEX_ROM[11] = ~8'b00111110;
+        HEX_ROM[12] = ~8'b10011100;
+        HEX_ROM[13] = ~8'b01111010;
+        HEX_ROM[14] = ~8'b10011110;
+        HEX_ROM[15] = ~8'b10001110;
+        OFF = ~8'b00000000;
+    end
+    
+    always@(posedge CLK)
+    begin
+        if(EN)
+            SSEG_CA = HEX_ROM[BIN];
+        else
+            SSEG_CA = OFF;
     end
 endmodule
 
-//module POS_SELECT(
-//    input [7:0] POS,
-//    input EN,
-//    output reg [7:0] SSEG_AN
-//    );
-//    always@(posedge EN)
-//    begin
-//        case(POS)
-//            3'o0: SSEG_AN = 8'h01;
-//            3'o1: SSEG_AN = 8'h02;
-//            3'o2: SSEG_AN = 8'h04;
-//            3'o3: SSEG_AN = 8'h08;
-//            3'o4: SSEG_AN = 8'h10;
-//            3'o5: SSEG_AN = 8'h20;
-//            3'o6: SSEG_AN = 8'h40;
-//            3'o7: SSEG_AN = 8'h80;
-//        endcase
-//    end
-//endmodule
+module POSSEL(
+    input [2:0] POS,
+    input CLK,
+    input EN,
+    output reg [7:0] SSEG_AN
+    );
+    reg [7:0] POS_ROM [7:0];
+    reg [7:0] OFF;
+    initial
+    begin
+        POS_ROM[0] = ~8'h01;
+        POS_ROM[1] = ~8'h02;
+        POS_ROM[2] = ~8'h04;
+        POS_ROM[3] = ~8'h08;
+        POS_ROM[4] = ~8'h10;
+        POS_ROM[5] = ~8'h20;
+        POS_ROM[6] = ~8'h40;
+        POS_ROM[7] = ~8'h80;
+        OFF = ~8'h00;
+    end
+    
+    always@(posedge CLK)
+    begin
+        if(EN)
+            SSEG_AN = POS_ROM[POS];
+        else
+            SSEG_AN = OFF;
+    end
+endmodule
