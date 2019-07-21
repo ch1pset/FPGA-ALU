@@ -1,3 +1,4 @@
-/FPGA-ALU.cache
-/FPGA-ALU.runs
-/FPGA-ALU.sim
+/FPGA-ALU.cache/*
+/FPGA-ALU.runs/*
+/FPGA-ALU.sim/*
+/FPGA-ALU.hw/*
