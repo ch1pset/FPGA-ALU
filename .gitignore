@@ -2,3 +2,4 @@
 /FPGA-ALU.runs/*
 /FPGA-ALU.sim/*
 /FPGA-ALU.hw/*
+/FPGA-ALU.ip_user_files/*
