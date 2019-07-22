@@ -20,7 +20,21 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module tb_sub_alu(
+module tb_sub_alu( );
+    reg [15:0] A, B;
+    wire [15:0] DIFF;
+    wire borrow;
 
-    );
+    mysubtr_alu SUB0(A, B, 0, DIFF, borrow);
+
+    initial
+    begin
+        A = 16'h0000;
+        B = 16'h0000;
+        #5 A = 16'ha5a5;
+        #5 B = 16'h5a5a;
+        #5 A = 16'h0f0f;
+        #5 B = 16'hf0f0;
+    end
+
 endmodule
