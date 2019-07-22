@@ -20,31 +20,33 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module myshft_rt_alu(in_data,enable,ext_bit,clock,out_data);
-    input[15:0]in_data;
-    input enable,ext_bit,clock;
-    output[15:0]out_data;
-    reg[15:0]out_data;
-    always@(posedge clock)
-        if(enable)
-        out_data<=in_data;
-        else
-            begin
-            out_data[0]<=out_data[1];
-            out_data[1]<=out_data[2];
-            out_data[2]<=out_data[3];
-            out_data[3]<=out_data[4];
-            out_data[4]<=out_data[5];
-            out_data[5]<=out_data[6];
-            out_data[6]<=out_data[7];
-            out_data[7]<=out_data[8];
-            out_data[8]<=out_data[9];
-            out_data[9]<=out_data[10];
-            out_data[10]<=out_data[11];
-            out_data[11]<=out_data[12];
-            out_data[12]<=out_data[13];
-            out_data[13]<=out_data[14];
-            out_data[14]<=out_data[15];
-            out_data[15]<=ext_bit;
-        end   
+module myshft_rt_alu(in_data, enable, out_data);
+    input [15:0] in_data;
+    input enable;
+    output reg [15:0] out_data;
+
+    initial
+    begin
+        out_data = 16'h0000;
+    end
+
+    always@(posedge enable)
+    begin
+        out_data[0]  <= in_data[1];
+        out_data[1]  <= in_data[2];
+        out_data[2]  <= in_data[3];
+        out_data[3]  <= in_data[4];
+        out_data[4]  <= in_data[5];
+        out_data[5]  <= in_data[6];
+        out_data[6]  <= in_data[7];
+        out_data[7]  <= in_data[8];
+        out_data[8]  <= in_data[9];
+        out_data[9]  <= in_data[10];
+        out_data[10] <= in_data[11];
+        out_data[11] <= in_data[12];
+        out_data[12] <= in_data[13];
+        out_data[13] <= in_data[14];
+        out_data[14] <= in_data[15];
+        out_data[15] <= 0;
+    end    
 endmodule
