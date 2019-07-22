@@ -22,10 +22,9 @@
 
 module tb_mul2( );
     reg [15:0] A, B;
-    reg CLK = 0, EN = 0, RST = 0;
     wire [31:0] Product;
     
-    Mul_16bit M(A, B, CLK, EN, RST, Product);
+    mul_16bit M(A, B, Product);
 
     initial
     begin
@@ -33,21 +32,14 @@ module tb_mul2( );
         B = 16'h0000;
 
         #5 A = 16'h0003;
-        EN = 1;
-        toggleReset();
         #5 B = 16'h0006;
-        toggleReset();
-
-
+        #5 A = 16'h000f;
+        #5 B = 16'h000f;
+        #5 A = 16'h0a0a;
+        #5 B = 16'ha0a0;
+        #5 A = 16'hffff;
+        #5 B = 16'hffff;
     end
     
-    always #1 CLK = ~CLK;
 
-    
-    task toggleReset;
-        begin
-            #1 RST = 1;
-            #1 RST = 0;
-        end
-    endtask
 endmodule

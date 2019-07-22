@@ -31,10 +31,18 @@ module DISP(
     output [7:0] AN
     );
     wire TICK;
+    reg MUL, ADD, SHFT, SUB;
     reg DISP_EN = 1;
-    reg [31:0] A = 32'h01234567;
-    REFRESH DISP(A, CLK100MHZ, DISP_EN, CA, AN);
+
+    reg [15:0] A, B;
+    reg [31:0] NUMBER;
+    wire [31:0] prod_w;
+
+    // reg [31:0] A = 32'h01234567;
+    REFRESH DISP(NUMBER, CLK100MHZ, DISP_EN, CA, AN);
     SLOWCLK SLOW(CLK100MHZ, TICK);
+
+    mul_16bit m0(A, B, prod_w);
     
     always@(posedge TICK)
     begin
@@ -44,9 +52,23 @@ module DISP(
             DISP_EN = 1;
             
         if(BTNU)
-            A = 32'h01234567;
-        else if(BTND)
-            A = 32'h89ABCDEF;
+            NUMBER = prod_w;
+
+        case(SW[1:0])
+        2'b00: begin
+            ADD = 0;
+            SUB = 0;
+            SHFT = 0;
+            MUL = 1;
+        end
+        endcase
+    end
+
+    always@(posedge MUL)
+    begin
+        A = 16'h00ff;
+        B = 16'h00ff;
+        MUL = 0;
     end
 endmodule
 
