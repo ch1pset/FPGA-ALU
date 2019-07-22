@@ -26,5 +26,15 @@ module tb_add_alu( );
     wire carry;
 
     myadd_alu A0(A, B, 0, sum, carry);
-    
+
+    initial
+    begin
+        A = 16'h0000;
+        B = 16'h0000;
+        #5 A = 16'h5a5a;
+        #5 B = 16'ha5a5;
+        #5 A = 16'hf0f0;
+        #5 B = 16'h0f0f;
+    end
+
 endmodule
