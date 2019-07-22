@@ -27,49 +27,103 @@ module DISP(
     input BTND,
     input BTNL,
     input BTNC,
+    input BTNRST,
     input [15:0] SW,
     output [15:0] LED,
     output [7:0] CA,
     output [7:0] AN
     );
     wire TICK;
-    reg [3:0] INSTR;
-    reg shr_en;
-    reg DISP_EN;
+    reg display_en;
 
     reg [15:0] A, B;
-    reg [31:0] NUMBER;
-    wire [31:0] prod_w;
-    wire [31:0] sum_w;
-    wire [31:0] diff_w;
-    wire [31:0] shr_w;
+    reg [31:0] display_data;
+    wire [31:0] data_bus;
 
     initial
     begin
-        DISP_EN = 1;
-        INSTR = 4'h0;
-        A = 16'h00ff;
-        B = 16'h00ff;
-        NUMBER = 32'h00000000;
+        display_en = 1;
+        A = 16'hf0f0;
+        B = 16'h0f0f;
+        display_data = {A, B};
     end
 
-    // reg [31:0] A = 32'h01234567;
-    REFRESH DISP(NUMBER, CLK100MHZ, DISP_EN, CA, AN);
+    REFRESH DISP(display_data, CLK100MHZ, display_en, CA, AN);
     SLOWCLK SLOW(CLK100MHZ, TICK);
-
-    mul_16bit      MUL_0(A, B, prod_w);
-    myadd_alu      ADD_0(A, B, 0, sum_w[15:0], sum_w[16]);
-    mysubtr_alu    SUB_0(A, B, 0, diff_w[15:0], diff_w[16]);
-    myshft_rt_alu  SHR_0(A, 1, 0, shr_en, shr_w[15:0]);
+    ALU     A0(SW[1:0], TICK, A, B, BTNRST, BTNU, BTND, BTNL, BTNR, BTNC, data_bus);
     
     always@(posedge TICK)
     begin
         if(BTNC)
-            DISP_EN = 0;
+            display_en = 0;
         else
-            DISP_EN = 1;
+            display_en = 1;
 
-        case(SW[1:0])
+        display_data = data_bus;
+    end
+
+endmodule
+
+module ALU(
+    input [1:0] OPCODE,
+    input CLK,
+    input [15:0] D1, D2,
+    input RST, INC, DEC, LFT, RHT, EVAL,
+    output reg [31:0] Dout
+    );
+    reg [15:0] A, B;
+    reg [31:0] Data;
+    reg [3:0] INSTR;
+    reg SET;
+    wire [31:0] prod_bus, sum_bus, diff_bus, shr_bus;
+
+    initial
+    begin
+        A = 16'h0000;
+        B = 16'h0000;
+        Data = 32'h00000000;
+        INSTR = 4'h0;
+        SET = 1;
+    end
+
+    mul_16bit       MUL_0(A, B, prod_bus);
+    myadd_alu       ADD_0(A, B, 0, sum_bus[15:0], sum_bus[16]);
+    mysubtr_alu     SUB_0(A, B, 0, diff_bus[15:0], diff_bus[16]);
+    myshft_rt_alu   SHR_0(Dout, shr_en, shr_bus[15:0]);
+
+    always@(posedge CLK)
+    begin
+        if(RST) begin
+            //todo: reset all values
+            A = D1;
+            B = D2;
+        end
+
+        if(INC) begin
+            //todo: handle increment
+
+        end
+
+        if(DEC) begin
+            //todo: handle decrement
+        end
+
+        if(LFT) begin
+
+        end
+
+        if(RHT) begin
+
+        end
+
+        if(EVAL)
+            //todo: trigger evaluation
+            SET = 1;
+        else
+            SET = 0;
+
+
+        case(OPCODE[1:0])
             2'b00: begin
                 INSTR = 4'h8;
             end
@@ -88,11 +142,16 @@ module DISP(
     always@(INSTR)
     begin
         case(INSTR)
-            4'h1: NUMBER = prod_w;
-            4'h2: NUMBER = shr_w;
-            4'h4: NUMBER = diff_w;
-            4'h8: NUMBER = sum_w;
+            4'h1: Data = prod_bus;
+            4'h2: Data = shr_bus;
+            4'h4: Data = diff_bus;
+            4'h8: Data = sum_bus;
         endcase
+    end
+
+    always@(posedge SET)
+    begin
+        Dout = Data;
     end
 
 endmodule
