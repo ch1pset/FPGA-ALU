@@ -24,7 +24,7 @@ module full_subtractor (a,b,cin,SUB,borrow);
     input a,b,cin;
     output SUB, borrow;
     assign SUB=a^b^cin;
-    assign borrow=((~a)*b)+(b*cin)+(cin*(~a));
+    assign borrow=((~a) & b) | (b & cin) | (cin & (~a));
 endmodule
 
 module mysubtr_alu(
